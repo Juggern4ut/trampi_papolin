@@ -100,7 +100,7 @@ class TrampiPlayer {
     this.multiplier = 1
 
     this.image = new Image()
-    this.image.src = "../res/img/player.svg"
+    this.image.src = "res/img/player.svg"
     this.isJumping = false
     this.isAirborne = false
     this.jumpingInterval = undefined
@@ -199,7 +199,7 @@ class TrampiEnemy {
     this.points = 50
 
     this.image = new Image()
-    this.image.src = "../res/img/red.svg"
+    this.image.src = "res/img/red.svg"
   }
 
   move = () => {
