@@ -27,7 +27,12 @@ class Trampi {
   drawEnemies = () => {
     for (let i = 0; i < this.enemies.length; i++) {
       const enemy = this.enemies[i]
-      enemy.move()
+      if (!enemy.isDead) {
+        enemy.move()
+      } else {
+        enemy.height = 20
+        enemy.y = 280
+      }
       if (enemy.destroy) {
         this.enemies.splice(i, 1)
       } else {
@@ -64,7 +69,10 @@ class Trampi {
     var res = this.player.checkEnemyCollision(this.enemies)
     if (res >= 0) {
       this.score += this.enemies[res].points * this.player.multiplier
-      this.enemies.splice(res, 1)
+      this.enemies[res].isDead = true
+      setTimeout(() => {
+        this.enemies.splice(res, 1)
+      }, 300)
       this.player.jump()
       this.player.multiplier++
     } else if (res === -2) {
@@ -110,7 +118,7 @@ class TrampiPlayer {
     this.width = 42
     this.groundLevel = 300 - this.height
     this.y = this.groundLevel - 100
-    this.x = 40
+    this.x = 150
     this.isMovingLeft = false
     this.isMovingRight = false
   }
@@ -128,6 +136,11 @@ class TrampiPlayer {
   checkEnemyCollision = enemies => {
     for (let i = 0; i < enemies.length; i++) {
       const enemy = enemies[i]
+
+      if (enemy.isDead) {
+        return -1
+      }
+
       if (this.x + this.width > enemy.x && this.x < enemy.x + enemy.width && this.y + this.height > enemy.y) {
         return -2
       } else if (this.x + this.width > enemy.x && this.x < enemy.x + enemy.width && this.y + this.height == enemy.y) {
@@ -196,6 +209,7 @@ class TrampiEnemy {
     this.width = 40
     this.height = 40
     this.destroy = false
+    this.isDead = false
     this.points = 50
 
     this.image = new Image()
