@@ -1,5 +1,6 @@
 class Trampi {
   constructor() {
+
     this.canvas = document.getElementById("trampi_canvas")
     this.ctx = this.canvas.getContext("2d")
     this.ctx.font = "15px Arial"
@@ -70,13 +71,14 @@ class Trampi {
     if (res >= 0) {
       this.score += this.enemies[res].points * this.player.multiplier
       this.enemies[res].isDead = true
+      this.player.playEnemyKillSound()
       setTimeout(() => {
         this.enemies.splice(res, 1)
       }, 300)
       this.player.jump()
       this.player.multiplier++
     } else if (res === -2) {
-      alert("You died!")
+      this.player.playDeathSound()
       this.reset()
     }
   }
@@ -121,6 +123,30 @@ class TrampiPlayer {
     this.x = 150
     this.isMovingLeft = false
     this.isMovingRight = false
+  }
+
+  playDeathSound = () => {
+    let music = ["E5 e", "E6 q"]
+
+    let ac = typeof AudioContext !== "undefined" ? new AudioContext() : new webkitAudioContext()
+    let tempo = 280
+
+    let sequence = new TinyMusic.Sequence(ac, tempo, music)
+    sequence.loop = false
+    sequence.smoothing = 0.9
+    sequence.play()
+  }
+
+  playEnemyKillSound = () => {
+    let music = ["E5 e", "E6 q"]
+
+    let ac = typeof AudioContext !== "undefined" ? new AudioContext() : new webkitAudioContext()
+    let tempo = 280
+
+    let sequence = new TinyMusic.Sequence(ac, tempo, music)
+    sequence.loop = false
+    sequence.smoothing = 0
+    sequence.play()
   }
 
   calculatePhysics = () => {
