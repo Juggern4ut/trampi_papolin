@@ -1,6 +1,5 @@
 class Trampi {
   constructor() {
-
     this.canvas = document.getElementById("trampi_canvas")
     this.ctx = this.canvas.getContext("2d")
     this.ctx.font = "15px Arial"
@@ -37,7 +36,13 @@ class Trampi {
       if (enemy.destroy) {
         this.enemies.splice(i, 1)
       } else {
-        this.ctx.drawImage(enemy.image, enemy.x, enemy.y, enemy.width, enemy.height)
+        this.ctx.drawImage(
+          enemy.image,
+          enemy.x,
+          enemy.y,
+          enemy.width,
+          enemy.height
+        )
       }
     }
   }
@@ -59,7 +64,13 @@ class Trampi {
   }
 
   drawPlayer = () => {
-    this.ctx.drawImage(this.player.image, this.player.x, this.player.y, this.player.height, this.player.width)
+    this.ctx.drawImage(
+      this.player.image,
+      this.player.x,
+      this.player.y,
+      this.player.height,
+      this.player.width
+    )
   }
 
   clearCanvas = () => {
@@ -128,7 +139,10 @@ class TrampiPlayer {
   playDeathSound = () => {
     let music = ["E5 e", "E6 q"]
 
-    let ac = typeof AudioContext !== "undefined" ? new AudioContext() : new webkitAudioContext()
+    let ac =
+      typeof AudioContext !== "undefined"
+        ? new AudioContext()
+        : new webkitAudioContext()
     let tempo = 280
 
     let sequence = new TinyMusic.Sequence(ac, tempo, music)
@@ -140,7 +154,10 @@ class TrampiPlayer {
   playEnemyKillSound = () => {
     let music = ["E5 e", "E6 q"]
 
-    let ac = typeof AudioContext !== "undefined" ? new AudioContext() : new webkitAudioContext()
+    let ac =
+      typeof AudioContext !== "undefined"
+        ? new AudioContext()
+        : new webkitAudioContext()
     let tempo = 280
 
     let sequence = new TinyMusic.Sequence(ac, tempo, music)
@@ -167,9 +184,17 @@ class TrampiPlayer {
         return -1
       }
 
-      if (this.x + this.width > enemy.x && this.x < enemy.x + enemy.width && this.y + this.height > enemy.y) {
+      if (
+        this.x + this.width > enemy.x &&
+        this.x < enemy.x + enemy.width &&
+        this.y + this.height > enemy.y
+      ) {
         return -2
-      } else if (this.x + this.width > enemy.x && this.x < enemy.x + enemy.width && this.y + this.height == enemy.y) {
+      } else if (
+        this.x + this.width > enemy.x &&
+        this.x < enemy.x + enemy.width &&
+        this.y + this.height == enemy.y
+      ) {
         return i
       } else {
         return -1
@@ -186,6 +211,28 @@ class TrampiPlayer {
   }
 
   bindMovement = () => {
+    document.getElementById("left").addEventListener("touchstart", () => {
+      this.isMovingLeft = true
+    })
+
+    document.getElementById("left").addEventListener("touchend", () => {
+      this.isMovingLeft = false
+    })
+
+    document.getElementById("right").addEventListener("touchstart", () => {
+      this.isMovingRight = true
+    })
+
+    document.getElementById("right").addEventListener("touchend", () => {
+      this.isMovingRight = false
+    })
+
+    document.getElementById("up").addEventListener("touchend", () => {
+      if (!this.isAirborne) {
+        this.jump()
+      }
+    })
+
     document.addEventListener("keypress", e => {
       if (e.code === "KeyA") {
         this.isMovingLeft = true

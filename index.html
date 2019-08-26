@@ -15,12 +15,34 @@
     canvas {
       background: #eee;
       display: block;
-      margin: 100px auto;
+      margin: 100px auto 0 auto;
     }
+
+    .controls{
+      margin: 30px auto;
+      width: 320px;
+    }
+
+    .button{
+      width: 50px;
+      height: 50px;
+      border: 1px solid #333;
+      display: inline-block;
+    }
+
+    .jump{
+      float: right;
+    }
+
   </style>
 </head>
 <body>
   <canvas id="trampi_canvas" width="320" height="320"></canvas>
+  <div class="controls">
+    <div class="button" id="left"></div>
+    <div class="button" id="right"></div>
+    <div class="button jump" id="up"></div>
+  </div>
   <script src="res/js/tinymusic.js"></script>
   <script src="res/js/trampi.js"></script>
 </body>
