@@ -43,14 +43,34 @@ class Trampi {
 
   generateEnemies = () => {
     setInterval(() => {
-      if (Math.round(Math.random())) {
-        if (Math.round(Math.random())) {
-          this.enemies.push(new Enemy3())
-        } else {
+      var rand = Math.floor(Math.random() * (100 - 0)) + 0
+
+      if (this.score < 2500) {
+        if (rand > 96) {
           this.enemies.push(new Enemy())
         }
+      } else if (this.score < 5000) {
+        if (rand > 95) {
+          this.enemies.push(new Enemy())
+        }
+
+        if (rand > 99) {
+          this.enemies.push(new Enemy2())
+        }
+      } else {
+        if (rand > 92) {
+          this.enemies.push(new Enemy())
+        }
+
+        if (rand > 96) {
+          this.enemies.push(new Enemy2())
+        }
+
+        if (rand > 98) {
+          this.enemies.push(new Enemy3())
+        }
       }
-    }, 600)
+    }, 50)
   }
 
   drawBackground = () => {
@@ -287,26 +307,28 @@ class Enemy {
 class Enemy2 extends Enemy {
   constructor() {
     super()
-    this.y = 200
-    this.minspeed = 23
-    this.maxspeed = 32
-    this.points = 75
+    this.width = 60
+    this.y = 180
+    this.minspeed = 28
+    this.maxspeed = 35
+    this.points = 85
 
     this.image = new Image()
-    this.image.src = "res/img/red_.svg"
+    this.image.src = "res/img/nico.svg"
   }
 }
 
 class Enemy3 extends Enemy {
   constructor() {
     super()
-    this.y = 180
-    this.minspeed = 28
-    this.maxspeed = 35
-    this.points = 100
+    this.height = 50
+    this.y = 130
+    this.minspeed = 40
+    this.maxspeed = 50
+    this.points = 150
 
     this.image = new Image()
-    this.image.src = "res/img/nico.svg"
+    this.image.src = "res/img/ho.svg"
   }
 }
 
