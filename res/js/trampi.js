@@ -24,7 +24,7 @@ class Trampi {
 
   drawScore = () => {
     this.ctx.fillText("Score: " + this.score, 10, 20)
-    this.ctx.fillText("Multiplier: " + this.player.multiplier, 10, 50)
+    this.ctx.fillText("Multiplier: " + this.player.multiplier, 10, 40)
   }
 
   drawEnemies = () => {
@@ -50,24 +50,18 @@ class Trampi {
           this.enemies.push(new Enemy())
         }
       } else if (this.score < 5000) {
-        if (rand > 95) {
-          this.enemies.push(new Enemy())
-        }
-
         if (rand > 99) {
           this.enemies.push(new Enemy2())
-        }
-      } else {
-        if (rand > 92) {
+        } else if (rand > 95) {
           this.enemies.push(new Enemy())
         }
-
-        if (rand > 96) {
-          this.enemies.push(new Enemy2())
-        }
-
+      } else {
         if (rand > 98) {
           this.enemies.push(new Enemy3())
+        } else if (rand > 96) {
+          this.enemies.push(new Enemy2())
+        } else if (rand > 92) {
+          this.enemies.push(new Enemy())
         }
       }
     }, 50)
@@ -94,8 +88,10 @@ class Trampi {
         this.enemies.splice(res, 1)
       }, 300)
       this.player.jump()
+      this.player.playJumpSound()
       this.player.multiplier++
     } else if (res === -1) {
+      this.player.playDeathSound()
       this.reset()
     }
   }
@@ -117,6 +113,7 @@ class Trampi {
     this.checkCollisions()
     this.drawScore()
     this.player.move()
+    console.log(this.player.isAirborne)
     window.requestAnimationFrame(this.draw)
   }
 }
@@ -144,15 +141,13 @@ class TrampiPlayer {
   }
 
   playDeathSound = () => {
-    let music = ["E5 e", "E6 q"]
+    this.deathSound = new Audio("res/audio/uh.mp3")
+    this.deathSound.play()
+  }
 
-    let ac = typeof AudioContext !== "undefined" ? new AudioContext() : new webkitAudioContext()
-    let tempo = 280
-
-    let sequence = new TinyMusic.Sequence(ac, tempo, music)
-    sequence.loop = false
-    sequence.smoothing = 0.9
-    sequence.play()
+  playJumpSound = () => {
+    this.jumpSound = new Audio("res/audio/boing.mp3")
+    this.jumpSound.play()
   }
 
   playEnemyKillSound = () => {
@@ -180,8 +175,9 @@ class TrampiPlayer {
   checkEnemyCollision = enemies => {
     for (let i = 0; i < enemies.length; i++) {
       const enemy = enemies[i]
+      var puffer = 10
 
-      if (this.x + this.width > enemy.x && this.x < enemy.x + enemy.width && this.y + this.height > enemy.y && this.y < enemy.y + enemy.height) {
+      if (this.x + this.width > enemy.x + puffer && this.x < enemy.x + enemy.width - puffer && this.y + this.height > enemy.y && this.y < enemy.y + enemy.height) {
         return -1
       } else if (this.x + this.width > enemy.x && this.x < enemy.x + enemy.width && this.y + this.height == enemy.y) {
         return i
@@ -190,6 +186,7 @@ class TrampiPlayer {
   }
 
   jump = () => {
+
     clearInterval(this.playerCancelJumpInterval)
     this.isJumping = true
     this.playerCancelJumpInterval = setTimeout(() => {
@@ -201,7 +198,7 @@ class TrampiPlayer {
     document.getElementById("left").addEventListener("touchstart", () => {
       this.isMovingLeft = true
     })
-
+ 
     document.getElementById("left").addEventListener("touchend", () => {
       this.isMovingLeft = false
     })
@@ -217,6 +214,7 @@ class TrampiPlayer {
     document.getElementById("up").addEventListener("touchstart", () => {
       if (!this.isAirborne) {
         this.jump()
+        this.playJumpSound()
       }
     })
 
@@ -231,6 +229,7 @@ class TrampiPlayer {
 
       if (e.code === "Space" && !this.isAirborne) {
         this.jump()
+        this.playJumpSound()
       }
     })
 
