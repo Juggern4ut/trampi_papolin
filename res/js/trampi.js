@@ -43,7 +43,7 @@ class Trampi {
 
   generateEnemies = () => {
     setInterval(() => {
-      var rand = Math.floor(Math.random() * (100 - 0)) + 0
+      var rand = Math.floor(Math.random() * (100 - 0)) + 1
 
       if (this.score < 2500) {
         if (rand > 96) {
