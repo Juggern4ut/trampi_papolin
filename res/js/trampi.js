@@ -18,7 +18,7 @@ class Trampi {
     this.player = new TrampiPlayer()
     this.player.bindMovement()
 
-    setInterval(this.draw, 10)
+    window.requestAnimationFrame(this.draw)
     this.generateEnemies()
   }
 
@@ -97,6 +97,7 @@ class Trampi {
     this.checkCollisions()
     this.drawScore()
     this.player.move()
+    window.requestAnimationFrame(this.draw)
   }
 }
 
