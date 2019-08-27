@@ -29,20 +29,11 @@ class Trampi {
       const enemy = this.enemies[i]
       if (!enemy.isDead) {
         enemy.move()
-      } else {
-        enemy.height = 20
-        enemy.y = 280
-      }
+      } 
       if (enemy.destroy) {
         this.enemies.splice(i, 1)
       } else {
-        this.ctx.drawImage(
-          enemy.image,
-          enemy.x,
-          enemy.y,
-          enemy.width,
-          enemy.height
-        )
+        this.ctx.drawImage(enemy.image, enemy.x, enemy.y, enemy.width, enemy.height)
       }
     }
   }
@@ -50,7 +41,11 @@ class Trampi {
   generateEnemies = () => {
     setInterval(() => {
       if (Math.round(Math.random())) {
-        this.enemies.push(new TrampiEnemy())
+        if (Math.round(Math.random())) {
+          this.enemies.push(new Enemy3())
+        }else{
+          this.enemies.push(new Enemy())
+        }
       }
     }, 800)
   }
@@ -64,13 +59,7 @@ class Trampi {
   }
 
   drawPlayer = () => {
-    this.ctx.drawImage(
-      this.player.image,
-      this.player.x,
-      this.player.y,
-      this.player.height,
-      this.player.width
-    )
+    this.ctx.drawImage(this.player.image, this.player.x, this.player.y, this.player.height, this.player.width)
   }
 
   clearCanvas = () => {
@@ -81,15 +70,13 @@ class Trampi {
     var res = this.player.checkEnemyCollision(this.enemies)
     if (res >= 0) {
       this.score += this.enemies[res].points * this.player.multiplier
-      this.enemies[res].isDead = true
-      this.player.playEnemyKillSound()
+      this.enemies[res].kill()
       setTimeout(() => {
         this.enemies.splice(res, 1)
       }, 300)
       this.player.jump()
       this.player.multiplier++
     } else if (res === -2) {
-      this.player.playDeathSound()
       this.reset()
     }
   }
@@ -116,8 +103,8 @@ class Trampi {
 
 class TrampiPlayer {
   constructor() {
-    this.gravity = 4
-    this.jumpDuration = 200
+    this.gravity = 5
+    this.jumpDuration = 400
     this.multiplier = 1
 
     this.image = new Image()
@@ -139,10 +126,7 @@ class TrampiPlayer {
   playDeathSound = () => {
     let music = ["E5 e", "E6 q"]
 
-    let ac =
-      typeof AudioContext !== "undefined"
-        ? new AudioContext()
-        : new webkitAudioContext()
+    let ac = typeof AudioContext !== "undefined" ? new AudioContext() : new webkitAudioContext()
     let tempo = 280
 
     let sequence = new TinyMusic.Sequence(ac, tempo, music)
@@ -154,10 +138,7 @@ class TrampiPlayer {
   playEnemyKillSound = () => {
     let music = ["E5 e", "E6 q"]
 
-    let ac =
-      typeof AudioContext !== "undefined"
-        ? new AudioContext()
-        : new webkitAudioContext()
+    let ac = typeof AudioContext !== "undefined" ? new AudioContext() : new webkitAudioContext()
     let tempo = 280
 
     let sequence = new TinyMusic.Sequence(ac, tempo, music)
@@ -184,17 +165,9 @@ class TrampiPlayer {
         return -1
       }
 
-      if (
-        this.x + this.width > enemy.x &&
-        this.x < enemy.x + enemy.width &&
-        this.y + this.height > enemy.y
-      ) {
+      if (this.x + this.width > enemy.x && this.x < enemy.x + enemy.width && this.y + this.height > enemy.y && this.y < enemy.y + enemy.height) {
         return -2
-      } else if (
-        this.x + this.width > enemy.x &&
-        this.x < enemy.x + enemy.width &&
-        this.y + this.height == enemy.y
-      ) {
+      } else if (this.x + this.width > enemy.x && this.x < enemy.x + enemy.width && this.y + this.height == enemy.y) {
         return i
       } else {
         return -1
@@ -227,7 +200,7 @@ class TrampiPlayer {
       this.isMovingRight = false
     })
 
-    document.getElementById("up").addEventListener("touchend", () => {
+    document.getElementById("up").addEventListener("touchstart", () => {
       if (!this.isAirborne) {
         this.jump()
       }
@@ -273,12 +246,15 @@ class TrampiPlayer {
   }
 }
 
-class TrampiEnemy {
+class Enemy {
   constructor() {
     this.direction = Math.round(Math.random())
     this.x = this.direction ? -50 : 370
     this.y = 260
-    this.speed = 2
+    this.speed = 0
+    this.minspeed = 20
+    this.maxspeed = 28
+    this.calculateSpeed(this.minspeed, this.maxspeed)
     this.width = 40
     this.height = 40
     this.destroy = false
@@ -286,19 +262,57 @@ class TrampiEnemy {
     this.points = 50
 
     this.image = new Image()
-    this.image.src = "res/img/red.svg"
+    this.image.src = "res/img/nino.svg"
+  }
+
+  calculateSpeed = (min, max) => {
+    this.speed = (Math.floor(Math.random() * (max - min)) + min) / 10
+  }
+
+  kill = () => {
+    this.isDead = true
+    this.height = 20
+    this.y += 20
   }
 
   move = () => {
-    if (this.direction) {
-      this.x += this.speed
-    } else {
-      this.x -= this.speed
+    if (!this.isDead) {
+      if (this.direction) {
+        this.x += this.speed
+      } else {
+        this.x -= this.speed
+      }
     }
 
     if (this.x > 370 || this.x < -50) {
       this.destroy = true
     }
+  }
+}
+
+class Enemy2 extends Enemy {
+  constructor() {
+    super()
+    this.y = 200
+    this.minspeed = 23
+    this.maxspeed = 32
+    this.points = 75
+
+    this.image = new Image()
+    this.image.src = "res/img/red_.svg"
+  }
+}
+
+class Enemy3 extends Enemy {
+  constructor() {
+    super()
+    this.y = 180
+    this.minspeed = 28
+    this.maxspeed = 35
+    this.points = 100
+
+    this.image = new Image()
+    this.image.src = "res/img/nico.svg"
   }
 }
 
