@@ -32,7 +32,7 @@ class Trampi {
       const enemy = this.enemies[i]
       if (!enemy.isDead) {
         enemy.move()
-      } 
+      }
       if (enemy.destroy) {
         this.enemies.splice(i, 1)
       } else {
@@ -46,11 +46,11 @@ class Trampi {
       if (Math.round(Math.random())) {
         if (Math.round(Math.random())) {
           this.enemies.push(new Enemy3())
-        }else{
+        } else {
           this.enemies.push(new Enemy())
         }
       }
-    }, 800)
+    }, 600)
   }
 
   drawBackground = () => {
@@ -75,7 +75,7 @@ class Trampi {
       }, 300)
       this.player.jump()
       this.player.multiplier++
-    } else if (res === -2) {
+    } else {
       this.reset()
     }
   }
@@ -161,16 +161,10 @@ class TrampiPlayer {
     for (let i = 0; i < enemies.length; i++) {
       const enemy = enemies[i]
 
-      if (enemy.isDead) {
-        return -1
-      }
-
       if (this.x + this.width > enemy.x && this.x < enemy.x + enemy.width && this.y + this.height > enemy.y && this.y < enemy.y + enemy.height) {
-        return -2
+        return -1
       } else if (this.x + this.width > enemy.x && this.x < enemy.x + enemy.width && this.y + this.height == enemy.y) {
         return i
-      } else {
-        return -1
       }
     }
   }
