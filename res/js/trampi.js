@@ -8,6 +8,9 @@ class Trampi {
     this.canvasWidth = 320
     this.score = 0
 
+    this.bg = new Image()
+    this.bg.src = "res/img/bg.svg"
+
     this.floorHeight = 20
     this.floorPos = this.canvasHeight - this.floorHeight
     this.enemies = []
@@ -50,12 +53,8 @@ class Trampi {
     }, 800)
   }
 
-  drawFloor = () => {
-    this.ctx.beginPath()
-    this.ctx.rect(0, this.floorPos, this.canvasHeight, this.floorHeight)
-    this.ctx.fillStyle = "#444444"
-    this.ctx.fill()
-    this.ctx.closePath()
+  drawBackground = () => {
+    this.ctx.drawImage(this.bg, 0, 0, 320, 320)
   }
 
   drawPlayer = () => {
@@ -90,7 +89,7 @@ class Trampi {
 
   draw = () => {
     this.clearCanvas()
-    this.drawFloor()
+    this.drawBackground()
 
     this.player.calculatePhysics()
     this.drawPlayer()
