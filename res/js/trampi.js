@@ -75,7 +75,7 @@ class Trampi {
       }, 300)
       this.player.jump()
       this.player.multiplier++
-    } else {
+    } else if (res === -1) {
       this.reset()
     }
   }
