@@ -38,15 +38,27 @@
       width: 80px;
       height: 80px;
       display: inline-block;
-      line-height: 80px;
-      text-align: center;
-      font-size: 40px;
       font-family: monospace;
       background-color: #fff;
+      background-size: 30px;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .button:focus, .button:hover, .button:active{
+      background-color: #999;
+    }
+
+    div#left{
+      background-image: url("res/img/left.svg")
     }
 
     div#up {
-      line-height: 95px;
+      background-image: url("res/img/jump.svg")
+    }
+
+    div#right {
+      background-image: url("res/img/right.svg")
     }
 
     .jump{
@@ -69,12 +81,12 @@
   <section>
     <canvas id="trampi_canvas" width="600" height="600"></canvas>
     <div class="controls">
-      <div class="button" id="left">&lt;</div>
-      <div class="button" id="right">&gt;</div>
-      <div class="button jump" id="up">^</div>
+      <div class="button" id="left"></div>
+      <div class="button" id="right"></div>
+      <div class="button jump" id="up"></div>
     </div>
   </section>
 
-  <script src="res/js/trampi.js?v=9"></script>
+  <script src="res/js/trampi.js?v=10"></script>
 </body>
 </html>

@@ -1,3 +1,5 @@
+var game
+
 class Trampi {
   constructor() {
     this.canvas = document.getElementById("trampi_canvas")
@@ -7,6 +9,7 @@ class Trampi {
     this.canvasHeight = 600
     this.canvasWidth = 600
     this.score = 0
+    this.isPaused = false
 
     this.bg = new Image()
     this.bg.src = "res/img/bg.svg"
@@ -15,7 +18,7 @@ class Trampi {
     this.floorPos = this.canvasHeight - this.floorHeight
     this.enemies = []
 
-    this.player = new TrampiPlayer(this.canvasHeight, this.canvasWidth)
+    this.player = new TrampiPlayer(this)
     this.player.bindMovement()
 
     window.requestAnimationFrame(this.draw)
@@ -30,7 +33,7 @@ class Trampi {
   drawEnemies = () => {
     for (let i = 0; i < this.enemies.length; i++) {
       const enemy = this.enemies[i]
-      if (!enemy.isDead) {
+      if (!enemy.isDead && !this.isPaused) {
         enemy.move()
       }
       if (enemy.destroy) {
@@ -47,21 +50,21 @@ class Trampi {
 
       if (this.score < 2500) {
         if (rand > 96) {
-          this.enemies.push(new Enemy(1, this.canvasWidth, this.canvasHeight))
+          this.enemies.push(new Enemy(1, this))
         }
       } else if (this.score < 5000) {
         if (rand > 99) {
-          this.enemies.push(new Enemy(1, this.canvasWidth, this.canvasHeight))
+          this.enemies.push(new Enemy(1, this))
         } else if (rand > 95) {
-          this.enemies.push(new Enemy(2, this.canvasWidth, this.canvasHeight))
+          this.enemies.push(new Enemy(2, this))
         }
       } else {
         if (rand > 99) {
-          this.enemies.push(new Enemy(1, this.canvasWidth, this.canvasHeight))
+          this.enemies.push(new Enemy(1, this))
         } else if (rand > 97) {
-          this.enemies.push(new Enemy(2, this.canvasWidth, this.canvasHeight))
+          this.enemies.push(new Enemy(2, this))
         } else if (rand > 95) {
-          this.enemies.push(new Enemy(3, this.canvasWidth, this.canvasHeight))
+          this.enemies.push(new Enemy(3, this))
         }
       }
     }, 50)
@@ -102,7 +105,7 @@ class Trampi {
 
   reset = () => {
     this.enemies = []
-    this.player = new TrampiPlayer(this.canvasHeight, this.canvasWidth)
+    this.player = new TrampiPlayer(this)
     this.player.bindMovement()
     this.score = 0
   }
@@ -111,7 +114,7 @@ class Trampi {
     this.clearCanvas()
     this.drawBackground()
 
-    this.player.calculatePhysics()
+    this.player.calculatePhysics(this.isPaused)
     this.drawPlayer()
     this.drawEnemies()
     this.checkCollisions()
@@ -122,10 +125,11 @@ class Trampi {
 }
 
 class TrampiPlayer {
-  constructor(canvasHeight, canvasWidth) {
+  constructor(game) {
     this.gravity = 10
     this.jumpDuration = 400
     this.multiplier = 1
+    this.game = game
 
     this.image = new Image()
     this.image.src = "res/img/player.svg"
@@ -136,9 +140,9 @@ class TrampiPlayer {
     this.speed = 3
     this.height = 100
     this.width = 100
-    this.groundLevel = canvasHeight - 20 - this.height
+    this.groundLevel = this.game.canvasHeight - 20 - this.height
     this.y = this.groundLevel - 100
-    this.x = (canvasWidth - this.width) / 2
+    this.x = (this.game.canvasWidth - this.width) / 2
     this.isMovingLeft = false
     this.isMovingRight = false
   }
@@ -154,6 +158,10 @@ class TrampiPlayer {
   }
 
   calculatePhysics = () => {
+    if (this.game.isPaused) {
+      return false
+    }
+
     if (this.y < this.groundLevel) {
       this.y += this.gravity
       this.isAirborne = true
@@ -217,6 +225,10 @@ class TrampiPlayer {
         this.isMovingRight = true
       }
 
+      if (e.code === "KeyP") {
+        this.game.isPaused = !this.game.isPaused
+      }
+
       if (e.code === "Space" && !this.isAirborne) {
         this.jump()
         this.playJumpSound()
@@ -235,6 +247,10 @@ class TrampiPlayer {
   }
 
   move = () => {
+    if (this.game.isPaused) {
+      return false
+    }
+
     if (this.isMovingLeft) {
       this.x -= this.speed
     }
@@ -250,37 +266,37 @@ class TrampiPlayer {
 }
 
 class Enemy {
-  constructor(level, canvasWidth, canvasHeight) {
+  constructor(level, game) {
+    this.game = game
     this.direction = Math.round(Math.random())
     this.speed = 0
     this.width = 100
     this.height = 100
     this.destroy = false
     this.isDead = false
-    this.canvasWidth = canvasWidth
 
     this.image = new Image()
-    this.x = this.direction ? -50 : canvasWidth + 50
+    this.x = this.direction ? -50 : this.game.canvasWidth + 50
 
     if (level === 3) {
       this.minspeed = 40
       this.maxspeed = 50
       this.points = 150
       this.height = 110
-      this.y = canvasHeight - this.height - 300
+      this.y = this.game.canvasHeight - this.height - 300
       this.image.src = "res/img/ho.svg"
     } else if (level === 2) {
       this.minspeed = 28
       this.maxspeed = 35
       this.points = 85
       this.width = 120
-      this.y = canvasHeight - this.height - 200
+      this.y = this.game.canvasHeight - this.height - 200
       this.image.src = "res/img/nico.svg"
     } else {
       this.minspeed = 20
       this.maxspeed = 28
       this.points = 50
-      this.y = canvasHeight - this.height - 20
+      this.y = this.game.canvasHeight - this.height - 20
       this.image.src = "res/img/nino.svg"
     }
 
@@ -306,12 +322,12 @@ class Enemy {
       }
     }
 
-    if (this.x > this.canvasWidth + 50 || this.x < -50) {
+    if (this.x > this.game.canvasWidth + 50 || this.x < -50) {
       this.destroy = true
     }
   }
 }
 
 window.onload = () => {
-  new Trampi()
+  window.game = new Trampi()
 }
