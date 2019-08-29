@@ -8,7 +8,7 @@ class Trampi {
 
     this.canvasHeight = 600
     this.canvasWidth = 600
-    this.score = 0
+    this.score = 5000
     this.isPaused = false
 
     this.bg = new Image()
@@ -46,6 +46,10 @@ class Trampi {
 
   generateEnemies = () => {
     setInterval(() => {
+      if (this.isPaused) {
+        return false
+      }
+
       var rand = Math.floor(Math.random() * (100 - 0)) + 1
 
       if (this.score < 2500) {
@@ -54,17 +58,27 @@ class Trampi {
         }
       } else if (this.score < 5000) {
         if (rand > 99) {
-          this.enemies.push(new Enemy(1, this))
-        } else if (rand > 95) {
           this.enemies.push(new Enemy(2, this))
-        }
-      } else {
-        if (rand > 99) {
+        } else if (rand > 95) {
           this.enemies.push(new Enemy(1, this))
+        }
+      } else if (this.score < 10000) {
+        if (rand > 99) {
+          this.enemies.push(new Enemy(3, this))
         } else if (rand > 97) {
           this.enemies.push(new Enemy(2, this))
         } else if (rand > 95) {
+          this.enemies.push(new Enemy(1, this))
+        }
+      } else {
+        if (rand > 99) {
+          this.enemies.push(new Enemy(4, this))
+        } else if (rand > 97) {
           this.enemies.push(new Enemy(3, this))
+        } else if (rand > 95) {
+          this.enemies.push(new Enemy(2, this))
+        } else if (rand > 93) {
+          this.enemies.push(new Enemy(1, this))
         }
       }
     }, 50)
@@ -108,6 +122,7 @@ class Trampi {
     this.player = new TrampiPlayer(this)
     this.player.bindMovement()
     this.score = 0
+    this.isPaused = false
   }
 
   draw = () => {
@@ -130,6 +145,7 @@ class TrampiPlayer {
     this.jumpDuration = 400
     this.multiplier = 1
     this.game = game
+    this.jumpForce = 0
 
     this.image = new Image()
     this.image.src = "res/img/player.svg"
@@ -137,7 +153,7 @@ class TrampiPlayer {
     this.isAirborne = false
     this.jumpingInterval = undefined
     this.playerCancelJumpInterval = undefined
-    this.speed = 3
+    this.speed = 4
     this.height = 100
     this.width = 100
     this.groundLevel = this.game.canvasHeight - 20 - this.height
@@ -176,19 +192,24 @@ class TrampiPlayer {
       const enemy = enemies[i]
       var puffer = enemy.width / 4
 
-      if (this.x + this.width > enemy.x + puffer && this.x < enemy.x + enemy.width - puffer && this.y + this.height > enemy.y && this.y < enemy.y + enemy.height) {
+      if (this.x + this.width > enemy.x + puffer && this.x < enemy.x + enemy.width - puffer && this.y + this.height > enemy.y + 15 && this.y < enemy.y + enemy.height) {
         return -1
-      } else if (this.x + this.width > enemy.x && this.x < enemy.x + enemy.width && this.y + this.height == enemy.y) {
+      } else if (this.x + this.width > enemy.x && this.x < enemy.x + enemy.width && this.y + this.height > enemy.y && this.y + this.height < enemy.y + 15) {
         return i
       }
     }
   }
 
   jump = () => {
-    clearInterval(this.playerCancelJumpInterval)
-    this.isJumping = true
-    this.playerCancelJumpInterval = setTimeout(() => {
-      this.isJumping = false
+    clearTimeout(this.jumpTimeout)
+    this.jumpForce = 200
+    this.jumpTimeout = setTimeout(() => {
+      this.playerCancelJumpInterval = setInterval(() => {
+        this.jumpForce -= 20
+        if (this.jumpForce == 0) {
+          clearInterval(this.playerCancelJumpInterval)
+        }
+      }, 10)
     }, this.jumpDuration)
   }
 
@@ -259,8 +280,8 @@ class TrampiPlayer {
       this.x += this.speed
     }
 
-    if (this.isJumping) {
-      this.y -= this.gravity * 2
+    if (this.jumpForce > 0) {
+      this.y -= this.jumpForce / 10
     }
   }
 }
@@ -278,20 +299,27 @@ class Enemy {
     this.image = new Image()
     this.x = this.direction ? -50 : this.game.canvasWidth + 50
 
-    if (level === 3) {
+    if (level === 4) {
       this.minspeed = 40
       this.maxspeed = 50
       this.points = 150
       this.height = 110
-      this.y = this.game.canvasHeight - this.height - 300
+      this.y = this.game.canvasHeight - this.height - 380
       this.image.src = "res/img/ho.svg"
-    } else if (level === 2) {
+    } else if (level === 3) {
       this.minspeed = 28
       this.maxspeed = 35
-      this.points = 85
+      this.points = 100
       this.width = 120
       this.y = this.game.canvasHeight - this.height - 200
       this.image.src = "res/img/nico.svg"
+    } else if (level === 2) {
+      this.minspeed = 25
+      this.maxspeed = 50
+      this.points = 75
+      this.width = 70
+      this.y = this.game.canvasHeight - this.height - 40
+      this.image.src = "res/img/gian.svg"
     } else {
       this.minspeed = 20
       this.maxspeed = 28
