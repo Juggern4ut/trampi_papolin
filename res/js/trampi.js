@@ -5,11 +5,13 @@ class Trampi {
     this.canvas = document.getElementById("trampi_canvas")
     this.ctx = this.canvas.getContext("2d")
     this.ctx.font = "25px Arial"
+    this.ctx.textAlign = "left"
 
     this.canvasHeight = 600
     this.canvasWidth = 600
     this.score = 0
     this.isPaused = false
+    this.scene = "home"
 
     this.bg = new Image()
     this.bg.src = "res/img/bg.svg"
@@ -21,13 +23,50 @@ class Trampi {
     this.player = new TrampiPlayer(this)
     this.player.bindMovement()
 
+    this.canvas.addEventListener("click", this.handleSceneChange)
+    this.canvas.addEventListener("touchend", this.handleSceneChange)
+
+
+
     window.requestAnimationFrame(this.draw)
     this.generateEnemies()
   }
 
+  handleSceneChange = () => {
+    if (this.scene == "home") {
+      this.startSound = new Audio("res/audio/start.mp3")
+      this.startSound.play()
+      this.scene = "playing"
+    } else if (this.scene == "dead") {
+      this.scene = "playing"
+      this.startSound = new Audio("res/audio/start.mp3")
+      this.startSound.play()
+      this.reset()
+    }
+  }
+
   drawScore = () => {
+    this.ctx.font = "25px Arial"
+    this.ctx.textAlign = "left"
     this.ctx.fillText("Score: " + this.score, 10, 30)
     this.ctx.fillText("Multiplier: " + this.player.multiplier, 10, 65)
+  }
+
+  drawDeathMessage = () => {
+    this.ctx.font = "60px Arial"
+    this.ctx.textAlign = "center"
+    this.ctx.fillText("YOU SUCK!", this.canvasWidth / 2, 250)
+    this.ctx.fillText("Score: " + this.score, this.canvasWidth / 2, 320)
+    this.ctx.font = "30px Arial"
+    this.ctx.fillText("Click to try again", this.canvasWidth / 2, 380)
+  }
+
+  drawStartButton = () => {
+    this.ctx.rect(175, 250, 250, 100)
+    this.ctx.stroke()
+    this.ctx.font = "60px Arial"
+    this.ctx.textAlign = "center"
+    this.ctx.fillText("START", this.canvasWidth / 2, 320)
   }
 
   drawEnemies = () => {
@@ -113,7 +152,7 @@ class Trampi {
       this.player.multiplier++
     } else if (res === -1) {
       this.player.playDeathSound()
-      this.reset()
+      this.scene = "dead"
     }
   }
 
@@ -127,14 +166,23 @@ class Trampi {
 
   draw = () => {
     this.clearCanvas()
-    this.drawBackground()
 
-    this.player.calculatePhysics(this.isPaused)
-    this.drawPlayer()
-    this.drawEnemies()
-    this.checkCollisions()
-    this.drawScore()
-    this.player.move()
+    if (this.scene == "playing") {
+      this.drawBackground()
+      this.player.calculatePhysics(this.isPaused)
+      this.drawPlayer()
+      this.drawEnemies()
+      this.checkCollisions()
+      this.drawScore()
+      this.player.move()
+    } else if (this.scene == "home") {
+      this.drawBackground()
+      this.drawStartButton()
+    } else if (this.scene == "dead") {
+      this.drawBackground()
+      this.drawDeathMessage()
+    }
+
     window.requestAnimationFrame(this.draw)
   }
 }
