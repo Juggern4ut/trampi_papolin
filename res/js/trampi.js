@@ -8,7 +8,7 @@ class Trampi {
 
     this.canvasHeight = 600
     this.canvasWidth = 600
-    this.score = 5000
+    this.score = 0
     this.isPaused = false
 
     this.bg = new Image()
